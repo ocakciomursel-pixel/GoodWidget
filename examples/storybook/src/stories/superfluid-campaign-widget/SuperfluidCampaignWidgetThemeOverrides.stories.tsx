@@ -7,15 +7,17 @@
  * Unlike GoodReserveWidget and AiCreditsWidget, this package defines no
  * named theme-component module at all (confirmed: zero `createComponent`
  * calls anywhere in packages/superfluid-campaign-widget/src) — every Card
- * and Button in the widget (outer shell, ActionCard, LeaderboardSummary,
- * LeaderboardRow, pagination/CTA buttons) is a plain primitive, so
+ * and Button in the widget is a plain primitive, so
  * dark_Card/light_Card/dark_Button/light_Button are the only override
- * paths this widget has. This is a design-system gap worth tracking
- * separately, not something to fix by inventing a new named module here.
+ * paths this widget has. Note that the outer widget shell
+ * (`SuperfluidCampaignWidget.tsx:287`) pins `backgroundColor="$backgroundDark"`,
+ * so `dark_Card.background` / `light_Card.background` only reaches the inner
+ * `ActionCard`, `LeaderboardSummary`, and `LeaderboardRow` cards (while
+ * `borderColor` reaches both the outer shell and those inner cards).
  *
  * The default "content" view with a populated leaderboard scenario is used
- * because it renders the outer shell Card, an ActionCard, and the
- * LeaderboardSummary card together with their CTA buttons in one view.
+ * because it renders the outer shell Card border, inner ActionCard and
+ * LeaderboardSummary cards, and their CTA buttons together in one view.
  */
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -89,10 +91,22 @@ const meta: Meta<OverridesArgs> = {
   tags: ['integrator', 'showcase'],
   parameters: { layout: 'padded' },
   argTypes: {
-    darkCardBackground: { control: 'color', description: 'themes.dark_Card.background' },
-    darkCardBorderColor: { control: 'color', description: 'themes.dark_Card.borderColor' },
-    lightCardBackground: { control: 'color', description: 'themes.light_Card.background' },
-    lightCardBorderColor: { control: 'color', description: 'themes.light_Card.borderColor' },
+    darkCardBackground: {
+      control: 'color',
+      description: 'themes.dark_Card.background (reaches ActionCard, LeaderboardSummary, LeaderboardRow; outer shell pins $backgroundDark)',
+    },
+    darkCardBorderColor: {
+      control: 'color',
+      description: 'themes.dark_Card.borderColor (reaches outer shell, ActionCard, LeaderboardSummary, LeaderboardRow)',
+    },
+    lightCardBackground: {
+      control: 'color',
+      description: 'themes.light_Card.background (reaches ActionCard, LeaderboardSummary, LeaderboardRow; outer shell pins $backgroundDark)',
+    },
+    lightCardBorderColor: {
+      control: 'color',
+      description: 'themes.light_Card.borderColor (reaches outer shell, ActionCard, LeaderboardSummary, LeaderboardRow)',
+    },
     darkButtonBackground: { control: 'color', description: 'themes.dark_Button.background' },
     darkButtonBackgroundHover: {
       control: 'color',
@@ -133,15 +147,17 @@ export const Playground: Story = {
         <DocsCallout title="All overridable paths on SuperfluidCampaignWidget" tone="info">
           <DocsList>
             <li>
-              <strong>dark_Card / light_Card</strong>: outer widget shell, ActionCard, the
-              LeaderboardSummary card, and each LeaderboardRow all cascade from this theme —
-              demonstrated below on the outer shell and ActionCard.
+              <strong>dark_Card / light_Card</strong>: `ActionCard`, `LeaderboardSummary`, and each
+              `LeaderboardRow` cascade both `background` and `borderColor` from this theme, while
+              the outer widget shell (`SuperfluidCampaignWidget.tsx:287`) pins
+              `backgroundColor="$backgroundDark"` and picks up `borderColor` only — demonstrated
+              below on `ActionCard`, `LeaderboardSummary`, and the outer shell border.
             </li>
             <li>
-              <strong>dark_Button / light_Button</strong>: the "Claim SUP rewards" header CTA,
-              wallet connect button, action-card CTAs, "View Leaderboard" button, and leaderboard
+              <strong>dark_Button / light_Button</strong>: the &quot;Claim SUP rewards&quot; header CTA,
+              wallet connect button, action-card CTAs, &quot;View Leaderboard&quot; button, and leaderboard
               pagination all cascade from this theme — demonstrated below on the action-card CTA
-              and the "View Leaderboard" button.
+              and the &quot;View Leaderboard&quot; button.
             </li>
           </DocsList>
         </DocsCallout>
@@ -153,8 +169,8 @@ export const Playground: Story = {
         </DocsCallout>
         <div>
           <p style={{ fontWeight: 600, marginBottom: 8 }}>
-            Content view, populated leaderboard scenario — shell card, action card, and CTA
-            buttons together
+            Content view, populated leaderboard scenario — inner ActionCard &amp; LeaderboardSummary
+            cards (background + border), outer shell border, and CTA buttons together
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div data-testid="SuperfluidCampaignWidget-theme-overrides-dark" style={{ width: 420 }}>

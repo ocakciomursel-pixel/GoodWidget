@@ -7,14 +7,16 @@
  * This widget's own named sub-components — `AiCreditsStatusNotice`,
  * `BonusBadgeFrame` (see packages/ai-credits-widget/src/components/theme/cards.ts)
  * — have no dedicated `light_*`/`dark_*` presets in packages/ui/src/presets.ts
- * (confirmed via grep), so they correctly cascade from the plain `Card`/`Button`
- * theme instead of overriding it. A `dark_Card`/`dark_Button` override is NOT a
- * no-op here.
- *
- * The quote-ready state is used because it renders the plain `Card` used by
- * `AiCreditsHero` (packages/ai-credits-widget/src/components/buy/AiCreditsHero.tsx)
- * alongside the plain primary `<Button>` inside `AmountPicker`, so a single pair
- * of dark/light instances exercises both targets at once.
+ * (confirmed via grep). Note, however, how the two cards in the quote-ready
+ * view differ:
+ *  - `AiCreditsHero` (packages/ai-credits-widget/src/components/buy/AiCreditsHero.tsx:52)
+ *    explicitly passes `backgroundColor="$backgroundSurface"` on its `<Card>`,
+ *    which outranks `dark_Card.background` / `light_Card.background`; it only
+ *    picks up `dark_Card.borderColor` / `light_Card.borderColor`.
+ *  - `AmountPicker` below it (packages/ai-credits-widget/src/components/buy/AmountPicker.tsx)
+ *    renders a plain `<Card>` with no inline `backgroundColor` override, so both
+ *    `dark_Card.background` / `light_Card.background` and `borderColor` reach it,
+ *    alongside the plain primary `<Button>` inside `AmountPicker`.
  */
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -29,8 +31,8 @@ import { DocsCallout, DocsList } from '../docs/DocsLayout'
 const provider = createCustodialEip1193Provider()
 
 // Mirrors the quote-ready fixture state used by AiCreditsWidgetQA.stories.tsx's
-// QuoteReady story, so this Playground renders the same Hero-card + Buy-button
-// surface as that reference fixture.
+// QuoteReady story, so this Playground renders the same Hero-card + AmountPicker-card
+// + Buy-button surface as that reference fixture.
 function createQuoteReadyAdapterFactory(): AiCreditsWidgetAdapterFactory {
   return () => {
     const state: AiCreditsWidgetAdapterState = {
@@ -157,10 +159,22 @@ const meta: Meta<OverridesArgs> = {
   tags: ['integrator', 'showcase'],
   parameters: { layout: 'padded' },
   argTypes: {
-    darkCardBackground: { control: 'color', description: 'themes.dark_Card.background' },
-    darkCardBorderColor: { control: 'color', description: 'themes.dark_Card.borderColor' },
-    lightCardBackground: { control: 'color', description: 'themes.light_Card.background' },
-    lightCardBorderColor: { control: 'color', description: 'themes.light_Card.borderColor' },
+    darkCardBackground: {
+      control: 'color',
+      description: 'themes.dark_Card.background (reaches AmountPicker card; AiCreditsHero pins $backgroundSurface)',
+    },
+    darkCardBorderColor: {
+      control: 'color',
+      description: 'themes.dark_Card.borderColor (reaches both AiCreditsHero and AmountPicker cards)',
+    },
+    lightCardBackground: {
+      control: 'color',
+      description: 'themes.light_Card.background (reaches AmountPicker card; AiCreditsHero pins $backgroundSurface)',
+    },
+    lightCardBorderColor: {
+      control: 'color',
+      description: 'themes.light_Card.borderColor (reaches both AiCreditsHero and AmountPicker cards)',
+    },
     darkButtonBackground: { control: 'color', description: 'themes.dark_Button.background' },
     darkButtonBackgroundHover: { control: 'color', description: 'themes.dark_Button.backgroundHover' },
     darkButtonColor: { control: 'color', description: 'themes.dark_Button.color' },
@@ -198,15 +212,16 @@ export const Playground: Story = {
           <DocsList>
             <li>
               <strong>dark_Card / light_Card</strong>: background, color, borderColor, shadowColor —
-              background and borderColor wired to the controls above; demonstrated below on the
-              `AiCreditsHero` balance card, which renders a plain Card with no dedicated preset of
-              its own
+              background and borderColor wired to the controls above. In the quote-ready view below,
+              `borderColor` reaches both `AiCreditsHero` and `AmountPicker`, while `background`
+              reaches the `AmountPicker` card (`AiCreditsHero` pins `backgroundColor="$backgroundSurface"`
+              in `AiCreditsHero.tsx:52`, which outranks `dark_Card.background` / `light_Card.background`)
             </li>
             <li>
               <strong>dark_Button / light_Button</strong>: background, backgroundHover,
               backgroundPress, backgroundFocus, color, borderColor, borderColorFocus, shadowColor —
               background, backgroundHover, and color wired to the controls above; demonstrated below
-              on the Buy tab's primary CTA button inside `AmountPicker`
+              on the Buy tab&apos;s primary CTA button inside `AmountPicker`
             </li>
             <li>
               <strong>dark_AiCreditsStatusNotice / dark_BonusBadgeFrame</strong>: no dedicated preset
@@ -224,7 +239,7 @@ export const Playground: Story = {
 
         <div>
           <p style={{ fontWeight: 600, marginBottom: 8 }}>
-            Quote-ready state — balance card and primary CTA button together
+            Quote-ready state — hero card border, AmountPicker card (background + border), and primary CTA button
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div data-testid="AiCreditsWidget-theme-overrides-dark" style={{ width: 380 }}>
