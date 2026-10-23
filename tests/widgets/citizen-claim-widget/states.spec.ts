@@ -199,3 +199,56 @@ test('CitizenClaimWidget claimExecution claimAll reports per-chain success and f
     fullPage: true,
   })
 })
+
+test('CitizenClaimWidget Theme overrides playground applies dark and light Card and Button overrides', async ({
+  page,
+  browserName,
+}) => {
+  test.skip(
+    browserName !== 'chromium',
+    'Live RPC test requires --disable-web-security / --ignore-certificate-errors',
+  )
+
+  await page.goto(
+    '/iframe.html?id=widgets-citizenclaimwidget-theme-overrides--playground&viewMode=story',
+  )
+  await page.waitForLoadState('domcontentloaded')
+
+  const cardDark = page.getByTestId('CitizenClaimWidget-theme-overrides-card-dark')
+  const cardLight = page.getByTestId('CitizenClaimWidget-theme-overrides-card-light')
+  await expect(cardDark).toBeVisible({ timeout: 20_000 })
+  await expect(cardLight).toBeVisible({ timeout: 20_000 })
+
+  await expect
+    .poll(async () =>
+      cardDark.evaluate((el) =>
+        Array.from(el.querySelectorAll('*')).some((node) => {
+          const style = window.getComputedStyle(node)
+          return (
+            style.backgroundColor === 'rgb(30, 27, 75)' &&
+            style.borderTopColor === 'rgb(124, 58, 237)'
+          )
+        }),
+      ),
+    )
+    .toBe(true)
+
+  await expect
+    .poll(async () =>
+      cardLight.evaluate((el) =>
+        Array.from(el.querySelectorAll('*')).some((node) => {
+          const style = window.getComputedStyle(node)
+          return (
+            style.backgroundColor === 'rgb(245, 243, 255)' &&
+            style.borderTopColor === 'rgb(124, 58, 237)'
+          )
+        }),
+      ),
+    )
+    .toBe(true)
+
+  await page.screenshot({
+    path: 'tests/widgets/citizen-claim-widget/test-results/ccw-06-theme-overrides-playground.png',
+    fullPage: true,
+  })
+})

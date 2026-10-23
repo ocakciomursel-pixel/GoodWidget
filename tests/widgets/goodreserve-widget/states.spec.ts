@@ -242,3 +242,24 @@ test('live adapter completes a buy: quote → confirm → success with tx hash',
   await expect(page.getByText('View on Explorer')).toBeVisible()
   await page.screenshot({ path: `${SCREENSHOT_DIR}/grw-16-live-buy-success.png` })
 })
+
+test('GoodReserveWidget Theme overrides playground applies dark and light CTA button overrides', async ({
+  page,
+}) => {
+  await gotoStory(page, 'widgets-goodreservewidget-theme-overrides--playground')
+
+  const darkRoot = page.getByTestId('GoodReserveWidget-theme-overrides-dark')
+  const lightRoot = page.getByTestId('GoodReserveWidget-theme-overrides-light')
+  await expect(darkRoot).toBeVisible()
+  await expect(lightRoot).toBeVisible()
+
+  const darkButton = darkRoot.getByRole('button', { name: 'Enter Amount' })
+  const lightButton = lightRoot.getByRole('button', { name: 'Enter Amount' })
+  await expect(darkButton).toHaveCSS('background-color', 'rgb(124, 58, 237)')
+  await expect(lightButton).toHaveCSS('background-color', 'rgb(124, 58, 237)')
+
+  await page.screenshot({
+    path: `${SCREENSHOT_DIR}/grw-19-theme-overrides-playground.png`,
+    fullPage: true,
+  })
+})

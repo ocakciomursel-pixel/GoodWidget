@@ -14,8 +14,10 @@
  * separately, not something to fix by inventing a new named module here.
  *
  * The default "content" view with a populated leaderboard scenario is used
- * because it renders the outer shell Card, an ActionCard, and the
- * LeaderboardSummary card together with their CTA buttons in one view.
+ * because it renders `ActionCard` and `LeaderboardSummary` (plain `Card`s
+ * where both `background` and `borderColor` cascade) alongside the outer shell
+ * `Card` (which pins `backgroundColor="$backgroundDark"` locally and inherits
+ * `borderColor`) and their CTA buttons in one view.
  */
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -133,9 +135,11 @@ export const Playground: Story = {
         <DocsCallout title="All overridable paths on SuperfluidCampaignWidget" tone="info">
           <DocsList>
             <li>
-              <strong>dark_Card / light_Card</strong>: outer widget shell, ActionCard, the
-              LeaderboardSummary card, and each LeaderboardRow all cascade from this theme —
-              demonstrated below on the outer shell and ActionCard.
+              <strong>dark_Card / light_Card</strong>: ActionCard, the LeaderboardSummary card, and
+              each LeaderboardRow cascade both `background` and `borderColor` from this theme —
+              demonstrated below on ActionCard and LeaderboardSummary. The outer widget shell pins
+              `backgroundColor="$backgroundDark"` locally, so only `borderColor` reaches the outer
+              shell.
             </li>
             <li>
               <strong>dark_Button / light_Button</strong>: the "Claim SUP rewards" header CTA,
@@ -153,8 +157,8 @@ export const Playground: Story = {
         </DocsCallout>
         <div>
           <p style={{ fontWeight: 600, marginBottom: 8 }}>
-            Content view, populated leaderboard scenario — shell card, action card, and CTA
-            buttons together
+            Content view, populated leaderboard scenario — action cards, leaderboard summary card,
+            shell border, and CTA buttons together
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div data-testid="SuperfluidCampaignWidget-theme-overrides-dark" style={{ width: 420 }}>

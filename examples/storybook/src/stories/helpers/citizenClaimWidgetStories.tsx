@@ -108,6 +108,7 @@ function CitizenClaimWidgetStoryShell({
 
   return (
     <CitizenClaimWidget
+      key={environment}
       provider={provider}
       environment={environment}
       data-testid={dataTestId}
