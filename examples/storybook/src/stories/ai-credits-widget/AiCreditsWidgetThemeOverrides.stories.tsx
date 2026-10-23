@@ -11,10 +11,12 @@
  * theme instead of overriding it. A `dark_Card`/`dark_Button` override is NOT a
  * no-op here.
  *
- * The quote-ready state is used because it renders the plain `Card` used by
- * `AiCreditsHero` (packages/ai-credits-widget/src/components/buy/AiCreditsHero.tsx)
- * alongside the plain primary `<Button>` inside `AmountPicker`, so a single pair
- * of dark/light instances exercises both targets at once.
+ * The quote-ready state is used because `AmountPicker` ("Buy Credits") renders
+ * a plain `Card` (`packages/ai-credits-widget/src/components/buy/AmountPicker.tsx`)
+ * alongside its plain primary `<Button>`, while `AiCreditsHero` pins
+ * `backgroundColor="$backgroundSurface"` locally and inherits `borderColor` from
+ * `Card`, so a single pair of dark/light instances exercises both `Card`
+ * (`background` + `borderColor`) and `Button` overrides at once.
  */
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -199,8 +201,10 @@ export const Playground: Story = {
             <li>
               <strong>dark_Card / light_Card</strong>: background, color, borderColor, shadowColor —
               background and borderColor wired to the controls above; demonstrated below on the
-              `AiCreditsHero` balance card, which renders a plain Card with no dedicated preset of
-              its own
+              `AmountPicker` ("Buy Credits") card, which renders a plain Card with no local
+              `backgroundColor` override (`AiCreditsHero` above it pins
+              `backgroundColor="$backgroundSurface"` locally, so only `borderColor` reaches the hero
+              card)
             </li>
             <li>
               <strong>dark_Button / light_Button</strong>: background, backgroundHover,
@@ -224,7 +228,7 @@ export const Playground: Story = {
 
         <div>
           <p style={{ fontWeight: 600, marginBottom: 8 }}>
-            Quote-ready state — balance card and primary CTA button together
+            Quote-ready state — Buy Credits card, hero border, and primary CTA button together
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div data-testid="AiCreditsWidget-theme-overrides-dark" style={{ width: 380 }}>

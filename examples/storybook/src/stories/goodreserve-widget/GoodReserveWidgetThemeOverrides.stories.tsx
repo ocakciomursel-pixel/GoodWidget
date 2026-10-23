@@ -10,14 +10,19 @@
  * `ReserveSuccessIcon`, `ReserveConfirmToBadge` (see
  * packages/goodreserve-widget/src/ReserveSwapView.tsx) — have no dedicated
  * `light_*`/`dark_*` presets in packages/ui/src/presets.ts (confirmed via
- * grep), so they correctly cascade from the plain `Card`/`Button` theme
- * instead of overriding it, unlike CitizenClaimWidget's `ClaimCard` family.
- * A `dark_Card`/`dark_Button` override is NOT a no-op here.
+ * grep), so they cascade from the plain `Card`/`Button` theme. However,
+ * `ReserveSwapShell` and `ReserveAmountCard` set component-level
+ * `backgroundColor: '$backgroundSurface'` and `backgroundColor: '$backgroundInput'`
+ * in `styled(Card, ...)` (and `ReserveAmountCard` sets `borderWidth: 0`), so
+ * `themes.dark_Card.background` / `themes.light_Card.background` cannot reach
+ * either card surface. Only `borderColor` on `dark_Card`/`light_Card` is wired
+ * (coloring `ReserveSwapShell`'s border), matching the border-only Card pattern
+ * in StreamingWidget and StakingMigrationWidget.
  *
- * The idle-buy fixture state is used because it renders the outer swap card
- * (`ReserveSwapShell`, extends Card), the amount panels (`ReserveAmountCard`,
- * extends Card), and the plain primary-CTA `<Button>` together in one state,
- * so a single pair of dark/light instances exercises both targets at once.
+ * The idle-buy fixture state is used because it renders the outer swap shell
+ * (`ReserveSwapShell`, extends Card with `borderWidth: 1`) and the plain
+ * primary-CTA `<Button>` together in one state, so a single pair of dark/light
+ * instances exercises both targets at once.
  */
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
@@ -54,9 +59,7 @@ function CodeBlock({ children }: { children: string }) {
 }
 
 interface OverridesArgs {
-  darkCardBackground: string
   darkCardBorderColor: string
-  lightCardBackground: string
   lightCardBorderColor: string
   darkButtonBackground: string
   darkButtonBackgroundHover: string
@@ -70,11 +73,9 @@ function buildThemeOverrides(args: OverridesArgs): ThemeOverrides {
   return {
     themes: {
       dark_Card: {
-        background: args.darkCardBackground,
         borderColor: args.darkCardBorderColor,
       },
       light_Card: {
-        background: args.lightCardBackground,
         borderColor: args.lightCardBorderColor,
       },
       dark_Button: {
@@ -96,9 +97,7 @@ const meta: Meta<OverridesArgs> = {
   tags: ['integrator', 'showcase'],
   parameters: { layout: 'padded' },
   argTypes: {
-    darkCardBackground: { control: 'color', description: 'themes.dark_Card.background' },
     darkCardBorderColor: { control: 'color', description: 'themes.dark_Card.borderColor' },
-    lightCardBackground: { control: 'color', description: 'themes.light_Card.background' },
     lightCardBorderColor: { control: 'color', description: 'themes.light_Card.borderColor' },
     darkButtonBackground: { control: 'color', description: 'themes.dark_Button.background' },
     darkButtonBackgroundHover: { control: 'color', description: 'themes.dark_Button.backgroundHover' },
@@ -108,9 +107,7 @@ const meta: Meta<OverridesArgs> = {
     lightButtonColor: { control: 'color', description: 'themes.light_Button.color' },
   },
   args: {
-    darkCardBackground: '#1e1b4b',
     darkCardBorderColor: '#7C3AED',
-    lightCardBackground: '#f5f3ff',
     lightCardBorderColor: '#7C3AED',
     darkButtonBackground: '#7C3AED',
     darkButtonBackgroundHover: '#6D28D9',
@@ -135,10 +132,12 @@ export const Playground: Story = {
         <DocsCallout title="All overridable paths on GoodReserveWidget" tone="info">
           <DocsList>
             <li>
-              <strong>dark_Card / light_Card</strong>: background, color, borderColor, shadowColor —
-              background and borderColor wired to the controls above; demonstrated below on the
-              outer swap shell and the two amount panels, all of which extend the plain Card theme
-              with no dedicated preset of their own
+              <strong>dark_Card / light_Card</strong>: borderColor, shadowColor — borderColor is
+              wired to the controls above and demonstrated below on the outer swap shell
+              (`ReserveSwapShell`). Card `background` is intentionally omitted because
+              `ReserveSwapShell` and `ReserveAmountCard` pin `backgroundColor: '$backgroundSurface'`
+              and `'$backgroundInput'` in `styled(Card, ...)`, which take precedence over
+              `dark_Card.background` / `light_Card.background`.
             </li>
             <li>
               <strong>dark_Button / light_Button</strong>: background, backgroundHover,
@@ -151,8 +150,7 @@ export const Playground: Story = {
                 dark_ReserveSwapShell / dark_ReserveAmountCard / dark_ReserveSurface / etc.
               </strong>
               : no dedicated preset exists for any named ReserveSwapView target (confirmed via
-              packages/ui/src/presets.ts), so they already cascade from Card/Button above — no
-              separate named-target controls are needed to reach them
+              packages/ui/src/presets.ts), so border/button overrides cascade from Card/Button above
             </li>
           </DocsList>
         </DocsCallout>
@@ -164,21 +162,25 @@ export const Playground: Story = {
 
         <div>
           <p style={{ fontWeight: 600, marginBottom: 8 }}>
-            Idle-buy state — outer swap card, amount panels, and primary CTA button together
+            Idle-buy state — outer swap shell border and primary CTA button together
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <GoodReserveWidget
-              provider={provider}
-              mockState={reserveWidgetMockStates.idleBuy}
-              defaultTheme="dark"
-              themeOverrides={themeOverrides}
-            />
-            <GoodReserveWidget
-              provider={provider}
-              mockState={reserveWidgetMockStates.idleBuy}
-              defaultTheme="light"
-              themeOverrides={themeOverrides}
-            />
+            <div data-testid="GoodReserveWidget-theme-overrides-dark">
+              <GoodReserveWidget
+                provider={provider}
+                mockState={reserveWidgetMockStates.idleBuy}
+                defaultTheme="dark"
+                themeOverrides={themeOverrides}
+              />
+            </div>
+            <div data-testid="GoodReserveWidget-theme-overrides-light">
+              <GoodReserveWidget
+                provider={provider}
+                mockState={reserveWidgetMockStates.idleBuy}
+                defaultTheme="light"
+                themeOverrides={themeOverrides}
+              />
+            </div>
           </div>
         </div>
       </div>

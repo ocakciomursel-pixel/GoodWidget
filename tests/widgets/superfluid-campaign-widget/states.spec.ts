@@ -841,3 +841,52 @@ for (const view of WALLET_CHIP_DISCONNECT_VIEWS) {
     })
   })
 }
+
+test('SuperfluidCampaignWidget Theme overrides playground applies dark and light Card and Button overrides', async ({
+  page,
+}) => {
+  await gotoStory(
+    page,
+    '/iframe.html?id=widgets-superfluidcampaignwidget-theme-overrides--playground&viewMode=story',
+  )
+
+  const darkRoot = page.getByTestId('SuperfluidCampaignWidget-theme-overrides-dark')
+  const lightRoot = page.getByTestId('SuperfluidCampaignWidget-theme-overrides-light')
+  await expect(darkRoot).toBeVisible()
+  await expect(lightRoot).toBeVisible()
+
+  await expect(darkRoot.getByRole('button', { name: 'View Leaderboard' })).toHaveCSS(
+    'background-color',
+    'rgb(124, 58, 237)',
+  )
+  await expect(lightRoot.getByRole('button', { name: 'View Leaderboard' })).toHaveCSS(
+    'background-color',
+    'rgb(124, 58, 237)',
+  )
+
+  const darkActionCardMatch = await darkRoot.evaluate((el) =>
+    Array.from(el.querySelectorAll('*')).some((node) => {
+      const style = window.getComputedStyle(node)
+      return (
+        style.backgroundColor === 'rgb(30, 27, 75)' &&
+        style.borderTopColor === 'rgb(124, 58, 237)'
+      )
+    }),
+  )
+  const lightActionCardMatch = await lightRoot.evaluate((el) =>
+    Array.from(el.querySelectorAll('*')).some((node) => {
+      const style = window.getComputedStyle(node)
+      return (
+        style.backgroundColor === 'rgb(245, 243, 255)' &&
+        style.borderTopColor === 'rgb(124, 58, 237)'
+      )
+    }),
+  )
+  expect(darkActionCardMatch).toBe(true)
+  expect(lightActionCardMatch).toBe(true)
+
+  await page.screenshot({
+    path: 'tests/widgets/superfluid-campaign-widget/test-results/scw-37-theme-overrides-playground.png',
+    fullPage: true,
+  })
+})

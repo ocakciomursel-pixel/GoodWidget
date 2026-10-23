@@ -178,8 +178,12 @@ export const Playground: Story = {
             Button surface — identity verification step (not-whitelisted custodial fixture)
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <CustodialLocalFixtureStory defaultTheme="dark" themeOverrides={themeOverrides} />
-            <CustodialLocalFixtureStory defaultTheme="light" themeOverrides={themeOverrides} />
+            <div data-testid="CitizenClaimWidget-theme-overrides-button-dark">
+              <CustodialLocalFixtureStory defaultTheme="dark" themeOverrides={themeOverrides} />
+            </div>
+            <div data-testid="CitizenClaimWidget-theme-overrides-button-light">
+              <CustodialLocalFixtureStory defaultTheme="light" themeOverrides={themeOverrides} />
+            </div>
           </div>
         </div>
 
@@ -188,16 +192,20 @@ export const Playground: Story = {
             Card surface — Invite Rewards / News tab placeholder
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <CustodialLocalFixtureStory
-              defaultTheme="dark"
-              themeOverrides={themeOverrides}
-              initialTab="invite-rewards"
-            />
-            <CustodialLocalFixtureStory
-              defaultTheme="light"
-              themeOverrides={themeOverrides}
-              initialTab="invite-rewards"
-            />
+            <div data-testid="CitizenClaimWidget-theme-overrides-card-dark">
+              <CustodialLocalFixtureStory
+                defaultTheme="dark"
+                themeOverrides={themeOverrides}
+                initialTab="invite-rewards"
+              />
+            </div>
+            <div data-testid="CitizenClaimWidget-theme-overrides-card-light">
+              <CustodialLocalFixtureStory
+                defaultTheme="light"
+                themeOverrides={themeOverrides}
+                initialTab="invite-rewards"
+              />
+            </div>
           </div>
         </div>
       </div>

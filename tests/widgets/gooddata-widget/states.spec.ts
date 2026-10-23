@@ -85,3 +85,28 @@ test('AiCreditsDashboard empty state — no daily records', async ({ page }) => 
     fullPage: true,
   })
 })
+
+test('AiCreditsDashboard Theme overrides playground applies dark and light Button overrides', async ({
+  page,
+}) => {
+  await gotoStory(
+    page,
+    '/iframe.html?id=widgets-gooddatawidget-theme-overrides--playground&viewMode=story',
+  )
+  const darkRoot = await expectWidget(page, 'GoodDataWidget-theme-overrides-dark')
+  const lightRoot = await expectWidget(page, 'GoodDataWidget-theme-overrides-light')
+
+  await expect(darkRoot.getByTestId('toggle-demo')).toHaveCSS(
+    'background-color',
+    'rgb(124, 58, 237)',
+  )
+  await expect(lightRoot.getByTestId('toggle-demo')).toHaveCSS(
+    'background-color',
+    'rgb(124, 58, 237)',
+  )
+
+  await page.screenshot({
+    path: 'tests/widgets/gooddata-widget/test-results/gdw-06-theme-overrides-playground.png',
+    fullPage: true,
+  })
+})
