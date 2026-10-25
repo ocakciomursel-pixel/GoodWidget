@@ -52,18 +52,40 @@ test('showcase demo exposes active and previous governance rounds with live allo
   await expect(activeVote).toBeVisible()
 })
 
-test('onboarding Back returns to the welcome step and Skip stays visually secondary', async ({ page }) => {
+test('onboarding Back returns to the welcome step and Skip stays visually secondary and reopens onboarding from banner', async ({ page }) => {
   await gotoStory(page, 'qa-governancewidget-runtime-fixtures--unstaked-returns-to-onboarding')
 
   const skipButton = page.getByTestId('GovernanceWidget-skip-onboarding')
   await expect(skipButton).toHaveCSS('border-width', '1px')
   await expect(skipButton).toHaveCSS('height', '32px')
   await skipButton.click()
-  await expect(page.getByTestId('GovernanceWidget-signup-banner')).toBeVisible()
+  const banner = page.getByTestId('GovernanceWidget-signup-banner')
+  await expect(banner).toBeVisible()
+  await expect(banner).toContainText('Sign up and stake to participate in GoodDAO')
+  await expect(page.getByTestId('GovernanceWidget-dashboard')).toBeVisible()
+
+  await banner.getByRole('button', { name: 'Sign Up' }).click()
+  await expect(page.getByTestId('GovernanceWidget-onboarding')).toBeVisible()
+  await expect(banner).toHaveCount(0)
 
   await gotoStory(page, 'qa-governancewidget-runtime-fixtures--unstaked-returns-to-onboarding')
   await page.getByRole('button', { name: 'Proceed to Membership' }).click()
   await expect(page.getByTestId('GovernanceOnboardingWidget-back')).toBeVisible()
   await page.getByTestId('GovernanceOnboardingWidget-back').click()
   await expect(page.getByRole('button', { name: 'Proceed to Membership' })).toBeVisible()
+})
+
+test('theme overrides playground applies ImpactCard background and GovernanceWrapper border overrides', async ({
+  page,
+}) => {
+  await gotoStory(page, 'widgets-governancewidget-theme-overrides--playground')
+
+  const root = page.getByTestId('GovernanceWidget-theme-overrides-playground')
+  await expect(root).toBeVisible()
+
+  const impactCard = root.getByTestId('GovernanceWidget-impact')
+  await expect(impactCard).toHaveCSS('background-color', 'rgb(30, 27, 75)')
+
+  const balanceCard = root.getByTestId('GovernanceWidget-active-members')
+  await expect(balanceCard).toHaveCSS('border-top-color', 'rgb(124, 58, 237)')
 })
