@@ -631,3 +631,47 @@ test('AiCreditsWidget Setup — Download AntSeed step is shown on Setup tab', as
     fullPage: true,
   })
 })
+
+test('AiCreditsWidget Theme overrides playground applies dark and light Card and Button overrides', async ({
+  page,
+}) => {
+  await gotoStory(
+    page,
+    '/iframe.html?id=widgets-aicreditswidget-theme-overrides--playground&viewMode=story',
+  )
+  const darkRoot = await expectWidget(page, 'AiCreditsWidget-theme-overrides-dark')
+  const lightRoot = await expectWidget(page, 'AiCreditsWidget-theme-overrides-light')
+
+  const darkButton = darkRoot.getByRole('button', { name: 'Buy AI Credits' })
+  const lightButton = lightRoot.getByRole('button', { name: 'Buy AI Credits' })
+  await expect(darkButton).toHaveCSS('background-color', 'rgb(124, 58, 237)')
+  await expect(lightButton).toHaveCSS('background-color', 'rgb(124, 58, 237)')
+
+  const darkCardMatch = await darkRoot.evaluate((el) => {
+    const nodes = Array.from(el.querySelectorAll('*'))
+    return nodes.some((node) => {
+      const style = window.getComputedStyle(node)
+      return (
+        style.backgroundColor === 'rgb(30, 27, 75)' &&
+        style.borderTopColor === 'rgb(124, 58, 237)'
+      )
+    })
+  })
+  const lightCardMatch = await lightRoot.evaluate((el) => {
+    const nodes = Array.from(el.querySelectorAll('*'))
+    return nodes.some((node) => {
+      const style = window.getComputedStyle(node)
+      return (
+        style.backgroundColor === 'rgb(245, 243, 255)' &&
+        style.borderTopColor === 'rgb(124, 58, 237)'
+      )
+    })
+  })
+  expect(darkCardMatch).toBe(true)
+  expect(lightCardMatch).toBe(true)
+
+  await page.screenshot({
+    path: 'tests/widgets/ai-credits-widget/test-results/acw-29-theme-overrides-playground.png',
+    fullPage: true,
+  })
+})
