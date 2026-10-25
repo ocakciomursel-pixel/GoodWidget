@@ -11,8 +11,9 @@
  * that already have theme keys wired for other widgets — those are documented as
  * reference-only below since they aren't governance-specific.
  *
- * Controls are wired for `dark_GovernanceWrapper` and `dark_ImpactCard` /
- * `dark_ImpactCardAction` — the handful of high-impact targets that visibly shift the
+ * Controls are wired for `dark_GovernanceWrapper` / `light_GovernanceWrapper` and
+ * `dark_ImpactCard` / `light_ImpactCard` / `dark_ImpactCardAction` /
+ * `light_ImpactCardAction` — the handful of high-impact targets that visibly shift the
  * default brand, not exhaustive coverage of every value.
  */
 import React from 'react'
@@ -93,12 +94,21 @@ const meta: Meta<OverridesArgs> = {
       options: ['light', 'dark'],
       description: 'Base theme applied via the widget’s own defaultTheme prop.',
     },
-    wrapperBorderColor: { control: 'color', description: 'themes.dark_GovernanceWrapper.borderColor' },
-    wrapperShadowColor: { control: 'color', description: 'themes.dark_GovernanceWrapper.shadowColor' },
-    impactCardBackground: { control: 'color', description: 'themes.dark_ImpactCard.backgroundColor' },
+    wrapperBorderColor: {
+      control: 'color',
+      description: 'themes.dark_GovernanceWrapper.borderColor / themes.light_GovernanceWrapper.borderColor',
+    },
+    wrapperShadowColor: {
+      control: 'color',
+      description: 'themes.dark_GovernanceWrapper.shadowColor / themes.light_GovernanceWrapper.shadowColor',
+    },
+    impactCardBackground: {
+      control: 'color',
+      description: 'themes.dark_ImpactCard.background / themes.light_ImpactCard.background',
+    },
     impactCardActionBackground: {
       control: 'color',
-      description: 'themes.dark_ImpactCardAction.backgroundColor',
+      description: 'themes.dark_ImpactCardAction.white / themes.light_ImpactCardAction.white',
     },
   },
   args: {
@@ -124,17 +134,17 @@ export const Playground: Story = {
         <DocsCallout title="All overridable paths on GovernanceWidget" tone="info">
           <DocsList>
             <li>
-              <strong>dark_GovernanceWrapper / light_GovernanceWrapper</strong>: backgroundColor,
+              <strong>dark_GovernanceWrapper / light_GovernanceWrapper</strong>: background,
               borderColor, color, shadowColor — wired to the controls above (borderColor and
               shadowColor only)
             </li>
             <li>
-              <strong>dark_ImpactCard / light_ImpactCard</strong>: backgroundColor, borderColor,
-              color — wired to the controls above (backgroundColor only)
+              <strong>dark_ImpactCard / light_ImpactCard</strong>: background, borderColor,
+              color, shadowColor — wired to the controls above (background only)
             </li>
             <li>
-              <strong>dark_ImpactCardAction / light_ImpactCardAction</strong>: backgroundColor,
-              color — wired to the controls above (backgroundColor only)
+              <strong>dark_ImpactCardAction / light_ImpactCardAction</strong>: white, color — wired
+              to the controls above (white only, mapped to ImpactCardAction backgroundColor)
             </li>
             {REFERENCE_ONLY_TARGETS.map((target) => (
               <li key={target.name}>

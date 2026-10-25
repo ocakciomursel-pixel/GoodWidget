@@ -59,19 +59,17 @@ test('Governance onboarding interactive flow persists selected house into profil
   await page.getByRole('button', { name: 'Continue', exact: true }).scrollIntoViewIfNeeded()
   await page.getByRole('button', { name: 'Continue', exact: true }).click({ force: true })
   await expect(page.getByText('Apply for House of Alignment', { exact: true })).toBeVisible()
-  await expect(page.getByText('Mission statement')).toBeVisible()
+  await expect(
+    page.getByText('Discourse link for mission statement and distribution strategy'),
+  ).toBeVisible()
   await captureEvidence(page, 'tests/widgets/governance-widget/test-results/gwo-03-profile-alignment.png')
 
   await page.getByPlaceholder('John Doe or Organization').fill('Solar Commons')
+  await page.getByPlaceholder('https://twitter.com/username').fill('https://twitter.com/solarcommons')
   await page.getByPlaceholder('https://example.com').fill('https://solar.example')
   await page
-    .getByPlaceholder(
-      'What is the primary goal of your alignment?',
-    )
-    .fill('Expand regenerative local access.')
-  await page
-    .getByPlaceholder('How do you plan to allocate resources?')
-    .fill('Allocate quarterly grants through community review.')
+    .getByPlaceholder('https://discourse.example.com/t/mission')
+    .fill('https://discourse.solar.example/t/mission')
   await page
     .getByRole('button', { name: 'Create Profile and Stake' })
     .scrollIntoViewIfNeeded()
@@ -162,13 +160,12 @@ test('Profile field handles rapid typing without losing characters (stale-closur
 
   await expect(webpageInput).toHaveValue(longWebpage)
 
-  // Multi-line textarea path — exercises ProfileTextAreaField's controlled-value
-  // reconciliation, which is the path most likely to drop characters under
-  // rapid React Native Web input events.
+  // Discourse mission URL field — exercises controlled-value reconciliation
+  // under rapid React Native Web input events.
   const missionArea = page.getByPlaceholder(
-    'What is the primary goal of your alignment?',
+    'https://discourse.example.com/t/mission',
   )
-  const longMission = `Expand regenerative local access. ${'Regenerative '.repeat(20)}`
+  const longMission = `https://discourse.example.com/t/${'regenerative-'.repeat(15)}mission`
   await missionArea.scrollIntoViewIfNeeded()
   await missionArea.click({ force: true })
   await page.keyboard.type(longMission, { delay: 0 })
@@ -179,7 +176,7 @@ test('Profile field handles rapid typing without losing characters (stale-closur
   // when the input is overwritten rather than incrementally typed into. This
   // guards against a regression where the stale closure was masked by always
   // typing into an empty field.
-  const newMission = 'All new copy after clearing the previous value.'
+  const newMission = 'https://discourse.example.com/t/updated-mission-strategy'
   await missionArea.fill('')
   await missionArea.scrollIntoViewIfNeeded()
   await missionArea.click({ force: true })

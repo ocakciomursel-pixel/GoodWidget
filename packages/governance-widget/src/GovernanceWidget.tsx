@@ -698,7 +698,7 @@ function GovernanceWidgetView({
       {state.status === 'revoked' ? <RevokedState state={state} /> : null}
       {shouldShowDashboard ? <GovernanceDashboard state={state} actions={actions} /> : null}
       {isActiveStatus(state.status) ? <MembershipExitState state={state} actions={actions} /> : null}
-      <MemberFooter state={state} />
+      <MemberFooter state={state} bounds={widgetBounds} />
     </YStack>
   )
 }
